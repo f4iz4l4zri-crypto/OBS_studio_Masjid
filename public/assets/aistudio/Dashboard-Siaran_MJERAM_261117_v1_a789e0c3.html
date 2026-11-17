@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Panel Siaran Langsung — Masjid Jeram</title>
+<style>
+:root{
+  --g:#0f6b46; --g-d:#0a4d33; --g-l:#e5f3ec; --r:#c0392b; --r-l:#fbe9e7; --o:#b9770e; --o-l:#fdf3e1;
+  --ink:#1b2a23; --mut:#5a6a62; --bd:#d5dfd9; --bg:#f3f6f4; --card:#fff; --rad:14px;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;font-family:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink);font-size:16px;line-height:1.45}
+header{background:var(--g);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;position:sticky;top:0;z-index:20;box-shadow:0 2px 8px rgba(0,0,0,.18)}
+.brand{display:flex;align-items:center;gap:12px}
+.brand .logo{width:42px;height:42px;border-radius:10px;background:#fff2;display:grid;place-items:center;font-size:24px}
+.brand h1{margin:0;font-size:20px;letter-spacing:.2px}
+.brand p{margin:0;font-size:13px;opacity:.85}
+.conn{display:flex;align-items:center;gap:10px;font-size:14px}
+.dot{width:12px;height:12px;border-radius:50%;background:#9aa;display:inline-block;box-shadow:0 0 0 3px #fff3}
+.dot.ok{background:#4be08c}.dot.bad{background:#ff6b5c}.dot.wait{background:#ffd24d}
+main{max-width:1180px;margin:18px auto;padding:0 14px 40px;display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:var(--rad);padding:16px 18px;box-shadow:0 1px 3px rgba(20,40,30,.05)}
+.card h2{margin:0 0 12px;font-size:17px;display:flex;align-items:center;gap:8px}
+.c12{grid-column:span 12}.c8{grid-column:span 8}.c7{grid-column:span 7}.c6{grid-column:span 6}.c5{grid-column:span 5}.c4{grid-column:span 4}
+@media(max-width:900px){.c8,.c7,.c6,.c5,.c4{grid-column:span 12}}
+.tip{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--g-l);color:var(--g-d);font-size:13px;font-weight:700;cursor:help;border:1px solid #b6d8c7;flex:none;user-select:none}
+.tip:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible{outline:3px solid #7cc4a1;outline-offset:2px}
+#tipbox{position:fixed;z-index:100;max-width:300px;background:#12261c;color:#fff;padding:9px 12px;border-radius:10px;font-size:14px;line-height:1.4;pointer-events:none;box-shadow:0 6px 18px rgba(0,0,0,.28);display:none}
+button{font:inherit;cursor:pointer;border:1px solid var(--bd);background:#fff;color:var(--ink);padding:10px 14px;border-radius:10px;min-height:44px;transition:background .12s,transform .05s}
+button:hover{background:#f0f5f2}button:active{transform:scale(.98)}
+button:disabled{opacity:.45;cursor:not-allowed}
+.btn-g{background:var(--g);color:#fff;border-color:var(--g)}.btn-g:hover{background:var(--g-d)}
+.btn-r{background:var(--r);color:#fff;border-color:var(--r)}.btn-r:hover{background:#a42f23}
+.btn-big{font-size:18px;font-weight:700;padding:14px 22px;min-height:56px}
+.armed{background:var(--o)!important;border-color:var(--o)!important;color:#fff!important}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.live-top{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-bottom:12px}
+.badge{font-weight:800;letter-spacing:.6px;padding:8px 16px;border-radius:999px;font-size:15px;background:#e6ebe8;color:#46544d}
+.badge.live{background:var(--r);color:#fff;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{box-shadow:0 0 0 7px #c0392b33}}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin:6px 0 14px}
+.stat{background:var(--bg);border-radius:10px;padding:8px 12px}
+.stat b{display:block;font-size:20px}.stat span{font-size:12.5px;color:var(--mut)}
+.stat.warn b{color:var(--r)}
+.scenes{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
+.scene{padding:14px 10px;font-weight:600;text-align:center;border:2px solid var(--bd);border-radius:12px;background:#fff;min-height:64px;word-break:break-word}
+.scene.on{border-color:var(--r);background:var(--r-l);color:#7a1d13}
+.scene.on::before{content:"● DISIARKAN\A";white-space:pre;display:block;font-size:11px;letter-spacing:.8px;color:var(--r)}
+label.f{display:block;font-size:13.5px;font-weight:600;margin:10px 0 4px;color:#2c3d34}
+input[type=text],input[type=password],input[type=number],select,textarea{width:100%;font:inherit;padding:10px 12px;border:1px solid #bccbc3;border-radius:10px;background:#fff;color:var(--ink)}
+textarea{min-height:64px;resize:vertical}
+.hint{font-size:13px;color:var(--mut);margin:6px 0 0}
+.items{display:flex;flex-direction:column;gap:6px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;background:var(--bg);border-radius:10px}
+.item .nm{display:flex;gap:8px;align-items:center;min-width:0;word-break:break-word}
+.sw{position:relative;width:52px;height:30px;flex:none}
+.sw input{opacity:0;position:absolute;inset:0;width:100%;height:100%;margin:0;cursor:pointer;z-index:2}
+.sw i{position:absolute;inset:0;background:#b9c5be;border-radius:999px;transition:.15s}
+.sw i::after{content:"";position:absolute;top:3px;left:3px;width:24px;height:24px;border-radius:50%;background:#fff;transition:.15s;box-shadow:0 1px 3px #0004}
+.sw input:checked+i{background:var(--g)}.sw input:checked+i::after{left:25px}
+.arow{padding:10px 12px;background:var(--bg);border-radius:12px;margin-bottom:10px}
+.arow.alert{background:var(--o-l);border:1px solid #efce8f}
+.ahead{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:6px}
+.ahead b{word-break:break-word}
+.meter{position:relative;height:16px;border-radius:8px;overflow:hidden;background:linear-gradient(90deg,#2e9e5b 0 62%,#e0a800 62% 88%,#d63c2f 88%)}
+.meter .mk{position:absolute;right:0;top:0;bottom:0;width:100%;background:#dfe6e2;transition:width .06s linear}
+.meter .pk{position:absolute;top:0;bottom:0;width:3px;background:#102;opacity:.8;left:0}
+.scale{display:flex;justify-content:space-between;font-size:11px;color:var(--mut);margin-top:2px}
+.arow .ctl{display:flex;gap:10px;align-items:center;margin-top:8px;flex-wrap:wrap}
+.arow input[type=range]{flex:1;min-width:140px;accent-color:var(--g);height:28px}
+.mute{min-width:92px}.mute.m{background:var(--r);color:#fff;border-color:var(--r)}
+.mon{font-size:13px;margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.mon select{width:auto;padding:6px 8px;font-size:13px}
+.warnbox{background:var(--o-l);border:1px solid #efce8f;color:#6b4a07;border-radius:10px;padding:8px 10px;font-size:13.5px;margin-top:8px}
+.checks label{display:flex;gap:10px;align-items:flex-start;padding:9px 6px;border-bottom:1px solid #edf1ee;cursor:pointer}
+.checks label:last-child{border:none}
+.checks input{width:22px;height:22px;margin-top:1px;accent-color:var(--g);flex:none}
+.progress{height:8px;border-radius:8px;background:#e1e8e4;overflow:hidden;margin:2px 0 8px}
+.progress i{display:block;height:100%;background:var(--g);width:0;transition:width .2s}
+details{border-top:1px solid #e6ece8;padding:10px 0}
+details:first-of-type{border-top:none}
+summary{cursor:pointer;font-weight:600}
+details ol,details ul{margin:8px 0 2px 20px;padding:0}
+details li{margin:4px 0}
+.empty{color:var(--mut);font-size:14px;padding:6px 2px}
+#toasts{position:fixed;right:14px;bottom:14px;z-index:90;display:flex;flex-direction:column;gap:8px;max-width:min(380px,calc(100vw - 28px))}
+.toast{background:#12261c;color:#fff;padding:11px 14px;border-radius:12px;box-shadow:0 6px 18px #0004;font-size:14.5px;animation:in .18s}
+.toast.bad{background:#8e2a1f}.toast.ok{background:#0f6b46}.toast.warn{background:#8a5a06}
+@keyframes in{from{transform:translateY(8px);opacity:0}}
+dialog{border:none;border-radius:16px;padding:0;max-width:560px;width:calc(100vw - 28px);box-shadow:0 20px 60px #0006}
+dialog::backdrop{background:#0008}
+dialog .in{padding:20px 22px}
+dialog h3{margin:0 0 8px}
+.two{display:grid;grid-template-columns:1fr 120px;gap:10px}
+.demo-banner{display:none;background:var(--o);color:#fff;text-align:center;padding:6px;font-size:14px;font-weight:600}
+footer{max-width:1180px;margin:0 auto;padding:0 14px 28px;color:var(--mut);font-size:12.5px;text-align:center}
+</style>
+</head>
+<body>
+<div class="demo-banner" id="demoBanner">MOD DEMO — paparan contoh sahaja, tiada kaitan dengan OBS sebenar. Tiada siaran sebenar akan bermula.</div>
+<header>
+  <div class="brand">
+    <div class="logo" aria-hidden="true">🕌</div>
+    <div><h1>Panel Siaran Langsung</h1><p>Masjid Jeram · kawalan OBS yang mudah</p></div>
+  </div>
+  <div class="conn">
+    <span class="dot" id="connDot"></span><span id="connText">Belum bersambung</span>
+    <button id="btnSettings" data-tip="Buka tetapan sambungan ke OBS (alamat, port dan kata laluan).">⚙ Sambungan</button>
+  </div>
+</header>
+
+<main>
+  <!-- SIARAN -->
+  <section class="card c12" id="cardLive">
+    <h2>1. Siaran <span class="tip" tabindex="0" data-tip="Butang utama untuk memulakan dan menamatkan siaran langsung. Butang TAMAT perlu ditekan dua kali supaya tidak tertekan secara tidak sengaja.">?</span></h2>
+    <div class="live-top">
+      <span class="badge" id="liveBadge">TIDAK DISIARKAN</span>
+      <div class="row">
+        <button class="btn-g btn-big" id="btnStart" data-tip="Mula siaran ke platform yang telah ditetapkan di OBS (Facebook/YouTube). Semak Senarai Semak dahulu.">▶ MULA SIARAN</button>
+        <button class="btn-r btn-big" id="btnStop" data-tip="Tamatkan siaran. Tekan dua kali untuk mengesahkan.">■ TAMAT SIARAN</button>
+        <button id="btnRec" data-tip="Rakam salinan siaran pada komputer ini (disyorkan sebagai sandaran jika internet terputus).">⏺ Mula Rakaman</button>
+      </div>
+    </div>
+    <div class="stats">
+      <div class="stat"><b id="stDur">00:00:00</b><span>Tempoh siaran</span></div>
+      <div class="stat" id="stDropBox"><b id="stDrop">0.0%</b><span>Frame tercicir <span class="tip" tabindex="0" data-tip="Peratus gambar yang gagal dihantar. Bawah 1% = baik. Jika naik tinggi, internet tidak stabil atau PC terlalu sibuk.">?</span></span></div>
+      <div class="stat"><b id="stCpu">–</b><span>CPU OBS</span></div>
+      <div class="stat"><b id="stFps">–</b><span>FPS</span></div>
+      <div class="stat"><b id="stRec">Mati</b><span>Rakaman</span></div>
+    </div>
+  </section>
+
+  <!-- SCENE -->
+  <section class="card c7">
+    <h2>2. Pilih Paparan <span class="tip" tabindex="0" data-tip="Paparan (Scene) ialah susunan skrin yang dilihat penonton, contohnya Kuliah, Khutbah atau Sebentar Lagi. Tekan satu paparan untuk menukarnya serta-merta.">?</span></h2>
+    <div class="scenes" id="scenes"><div class="empty">Belum bersambung ke OBS.</div></div>
+  </section>
+
+  <!-- CHECKLIST -->
+  <section class="card c5">
+    <h2>Senarai Semak Sebelum Siaran <span class="tip" tabindex="0" data-tip="Tanda setiap perkara sebelum menekan Mula Siaran. Senarai ini akan set semula secara automatik setiap hari.">?</span></h2>
+    <div class="progress"><i id="chkBar"></i></div>
+    <div class="checks" id="checks"></div>
+    <div class="row" style="margin-top:8px"><button id="btnChkReset" data-tip="Kosongkan semua tanda untuk siaran seterusnya.">Set semula</button><span class="hint" id="chkTxt"></span></div>
+  </section>
+
+  <!-- TEKS -->
+  <section class="card c6">
+    <h2>3. Tajuk &amp; Penceramah <span class="tip" tabindex="0" data-tip="Isi maklumat yang mahu dipaparkan pada skrin siaran, kemudian tekan Hantar ke Skrin. Tulisan pada skrin siaran akan berubah serta-merta.">?</span></h2>
+    <label class="f" for="fTajuk">Tajuk kuliah / program</label>
+    <input type="text" id="fTajuk" placeholder="Contoh: Kuliah Maghrib — Tafsir Surah Al-Kahfi">
+    <label class="f" for="fPenceramah">Nama penceramah</label>
+    <input type="text" id="fPenceramah" placeholder="Contoh: Ustaz Yasin">
+    <label class="f" for="fBerjalan">Teks berjalan (bawah skrin)</label>
+    <textarea id="fBerjalan" placeholder="Contoh: Selamat datang ke siaran langsung Masjid Jeram. Jom infaq melalui kod QR."></textarea>
+    <div class="row" style="margin-top:12px">
+      <button class="btn-g" id="btnSendText" data-tip="Hantar tiga kotak di atas ke skrin siaran.">Hantar ke Skrin</button>
+      <button id="btnClearText" data-tip="Kosongkan tulisan pada skrin siaran (kotak di sini tidak dipadam).">Kosongkan Skrin</button>
+    </div>
+    <details style="margin-top:14px"><summary>Simpan / guna semula (preset)</summary>
+      <label class="f" for="pSel">Preset tersimpan <span class="tip" tabindex="0" data-tip="Simpan tajuk, penceramah dan teks berjalan yang kerap digunakan supaya tidak perlu menaip semula setiap kali.">?</span></label>
+      <div class="row"><select id="pSel" style="flex:1"></select><button id="pLoad">Guna</button><button id="pDel">Padam</button></div>
+      <label class="f" for="pName">Simpan paparan di atas sebagai preset baharu</label>
+      <div class="row"><input type="text" id="pName" placeholder="Nama preset, cth: Kuliah Subuh Sabtu" style="flex:1"><button id="pSave">Simpan</button></div>
+    </details>
+    <details><summary>Tetapan lanjutan: pilih kotak teks OBS <span class="tip" tabindex="0" data-tip="Biasanya dikesan automatik. Tukar hanya jika tulisan tidak muncul pada kotak yang betul di skrin siaran.">?</span></summary>
+      <label class="f" for="mTajuk">Kotak teks untuk Tajuk</label><select id="mTajuk"></select>
+      <label class="f" for="mPenceramah">Kotak teks untuk Penceramah</label><select id="mPenceramah"></select>
+      <label class="f" for="mBerjalan">Kotak teks untuk Teks Berjalan</label><select id="mBerjalan"></select>
+      <p class="hint">Hanya sumber jenis “Text” dalam OBS disenaraikan di sini.</p>
+    </details>
+  </section>
+
+  <!-- LAPISAN -->
+  <section class="card c6">
+    <h2>4. Logo &amp; Lapisan <span class="tip" tabindex="0" data-tip="Hidupkan atau matikan item pada paparan yang sedang dipilih, seperti logo, kod QR infaq atau teks. Hanya paparan semasa terkesan.">?</span></h2>
+    <p class="hint" style="margin-top:0">Paparan semasa: <b id="curScene">–</b></p>
+    <div class="items" id="items"><div class="empty">Belum bersambung ke OBS.</div></div>
+  </section>
+
+  <!-- AUDIO -->
+  <section class="card c12">
+    <h2>5. Audio <span class="tip" tabindex="0" data-tip="Semak bunyi yang sedang dihantar ke siaran. Meter hijau/kuning bermaksud baik. Merah bermaksud terlalu kuat dan bunyi akan pecah.">?</span></h2>
+    <p class="hint" style="margin-top:0">Sasaran: meter bergerak di kawasan <b>hijau–kuning</b>. Jika kerap <b>merah</b>, kecilkan bunyi di mixer atau di sini.</p>
+    <div id="audio"><div class="empty">Belum bersambung ke OBS.</div></div>
+  </section>
+
+  <!-- PANDUAN -->
+  <section class="card c12">
+    <h2>Panduan Ringkas &amp; Penyelesaian Masalah</h2>
+    <details open><summary>Cara siaran (5 langkah)</summary>
+      <ol><li>Semak <b>Senarai Semak</b> dan pastikan meter audio bergerak.</li><li>Pilih <b>Paparan</b> yang sesuai.</li><li>Isi <b>Tajuk</b> dan <b>Penceramah</b>, kemudian <b>Hantar ke Skrin</b>.</li><li>Tekan <b>MULA SIARAN</b>. Pastikan lencana bertukar merah <b>LANGSUNG</b>.</li><li>Selepas selesai, tekan <b>TAMAT SIARAN</b> dua kali.</li></ol>
+    </details>
+    <details><summary>Panel tidak dapat bersambung ke OBS</summary>
+      <ul><li>Pastikan aplikasi <b>OBS Studio</b> sudah dibuka.</li><li>Dalam OBS: <b>Tools → WebSocket Server Settings</b> → tanda <b>Enable WebSocket server</b>. Port biasa ialah <b>4455</b>.</li><li>Jika kata laluan ditetapkan, masukkannya di <b>⚙ Sambungan</b> pada panel ini.</li><li>Pastikan alamat ialah <b>localhost</b> jika panel dibuka pada PC yang sama dengan OBS.</li></ul>
+    </details>
+    <details><summary>Bunyi keluar dua kali dari sistem PA</summary>
+      <ul><li>Lihat bahagian <b>Audio</b>: jika ada amaran kuning “Monitor aktif”, tekan <b>Matikan monitor</b>.</li><li>Pastikan tiada bunyi dari PC dihantar kembali ke mixer (contoh: kabel USB/Aux balik ke saluran mixer).</li><li>Jika masih berlaku, hubungi juruteknik ZIAZ untuk semakan di tapak.</li></ul>
+    </details>
+    <details><summary>Tiada bunyi dalam siaran</summary>
+      <ul><li>Lihat meter pada bahagian <b>Audio</b>. Jika tidak bergerak, semak butang <b>Senyap</b> dan paras bunyi di mixer.</li><li>Semak kabel USB penukar audio pada PC.</li></ul>
+    </details>
+  </section>
+</main>
+<footer>Panel ini dibina untuk Masjid Jeram · ZIAZ Resources (M) Sdn Bhd · v1.0 (draf). Panel hanya mengawal OBS pada rangkaian setempat dan tidak menghantar data ke mana-mana pelayan luar.</footer>
+
+<dialog id="dlg"><div class="in">
+  <h3>Sambungan ke OBS</h3>
+  <p class="hint" style="margin-top:0">Panel ini bercakap dengan OBS melalui ciri WebSocket yang sudah terbina dalam OBS Studio.</p>
+  <div class="two"><div><label class="f" for="cHost">Alamat PC OBS <span class="tip" tabindex="0" data-tip="Guna localhost jika panel dibuka pada komputer yang sama dengan OBS. Jika dari tablet/telefon, guna alamat IP komputer OBS, cth 192.168.1.20.">?</span></label><input type="text" id="cHost" value="localhost"></div>
+  <div><label class="f" for="cPort">Port</label><input type="number" id="cPort" value="4455"></div></div>
+  <label class="f" for="cPass">Kata laluan WebSocket <span class="tip" tabindex="0" data-tip="Kata laluan yang ditetapkan di OBS pada Tools → WebSocket Server Settings. Kosongkan jika tiada.">?</span></label>
+  <input type="password" id="cPass" autocomplete="off">
+  <label style="display:flex;gap:8px;align-items:center;margin-top:10px;font-size:14px"><input type="checkbox" id="cRem" checked style="width:18px;height:18px"> Ingat tetapan pada komputer ini</label>
+  <div class="row" style="margin-top:16px;justify-content:space-between">
+    <div class="row"><button class="btn-g" id="cGo">Sambung</button><button id="cOff" data-tip="Putuskan sambungan dari OBS.">Putuskan</button></div>
+    <div class="row"><button id="cDemo" data-tip="Cuba panel dengan data contoh, tanpa OBS. Selamat untuk latihan.">Cuba Mod Demo</button><button id="cClose">Tutup</button></div>
+  </div>
+</div></dialog>
+
+<div id="tipbox" role="tooltip"></div>
+<div id="toasts" aria-live="polite"></div>
+
+<script>
+"use strict";
+/* ============ Utiliti ============ */
+const $=s=>document.querySelector(s);
+const LS={get(k,d){try{const v=localStorage.getItem(k);return v==null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+function el(tag,attrs,...kids){const e=document.createElement(tag);for(const k in(attrs||{})){const v=attrs[k];if(k==='class')e.className=v;else if(k==='text')e.textContent=v;else if(k.startsWith('on'))e[k]=v;else if(v!==false&&v!=null)e.setAttribute(k,v===true?'':v)}kids.flat().forEach(c=>{if(c!=null)e.append(c.nodeType?c:document.createTextNode(c))});return e}
+function toast(msg,type){const t=el('div',{class:'toast '+(type||''),text:msg});$('#toasts').append(t);setTimeout(()=>t.remove(),type==='bad'?7000:4200)}
+const pad=n=>String(n).padStart(2,'0');
+const fmtDur=ms=>{const s=Math.floor(ms/1000);return pad(Math.floor(s/3600))+':'+pad(Math.floor(s%3600/60))+':'+pad(s%60)};
+const db=m=>m>0?20*Math.log10(m):-100;
+
+/* ============ SHA-256 (tanpa kebergantungan, berfungsi walau bukan HTTPS) ============ */
+const SHA=(()=>{const P=[];for(let n=2;P.length<64;n++){let ok=true;for(let d=2;d*d<=n;d++)if(n%d===0){ok=false;break}if(ok)P.push(n)}
+ const fr=x=>Math.floor((x-Math.floor(x))*4294967296)>>>0;
+ const K=P.map(p=>fr(Math.cbrt(p))),H0=P.slice(0,8).map(p=>fr(Math.sqrt(p)));
+ const rr=(x,n)=>(x>>>n)|(x<<(32-n));
+ return function(bytes){const l=bytes.length,nb=((l+9+63)>>6)<<6,m=new Uint8Array(nb);m.set(bytes);m[l]=0x80;
+  const dv=new DataView(m.buffer);dv.setUint32(nb-4,(l*8)>>>0);dv.setUint32(nb-8,Math.floor(l*8/4294967296));
+  const h=H0.slice(),w=new Uint32Array(64);
+  for(let o=0;o<nb;o+=64){for(let i=0;i<16;i++)w[i]=dv.getUint32(o+i*4);
+   for(let i=16;i<64;i++){const a=w[i-15],b=w[i-2];const s0=rr(a,7)^rr(a,18)^(a>>>3),s1=rr(b,17)^rr(b,19)^(b>>>10);w[i]=(w[i-16]+s0+w[i-7]+s1)>>>0}
+   let [a,b,c,d,e,f,g,hh]=h;
+   for(let i=0;i<64;i++){const S1=rr(e,6)^rr(e,11)^rr(e,25),ch=(e&f)^(~e&g),t1=(hh+S1+ch+K[i]+w[i])>>>0,S0=rr(a,2)^rr(a,13)^rr(a,22),mj=(a&b)^(a&c)^(b&c),t2=(S0+mj)>>>0;
+    hh=g;g=f;f=e;e=(d+t1)>>>0;d=c;c=b;b=a;a=(t1+t2)>>>0}
+   h[0]=(h[0]+a)>>>0;h[1]=(h[1]+b)>>>0;h[2]=(h[2]+c)>>>0;h[3]=(h[3]+d)>>>0;h[4]=(h[4]+e)>>>0;h[5]=(h[5]+f)>>>0;h[6]=(h[6]+g)>>>0;h[7]=(h[7]+hh)>>>0}
+  const out=new Uint8Array(32),ov=new DataView(out.buffer);h.forEach((v,i)=>ov.setUint32(i*4,v));return out}})();
+const b64=u8=>btoa(String.fromCharCode(...u8));
+const utf8=s=>new TextEncoder().encode(s);
+const sha256b64=s=>b64(SHA(utf8(s)));
+
+/* ============ Klien obs-websocket v5 ============ */
+class ObsClient{
+  constructor(){this.ws=null;this.pend=new Map();this.rid=1;this.h={};this.ok=false;this.manual=false}
+  on(e,f){(this.h[e]=this.h[e]||[]).push(f)}
+  emit(e,d){(this.h[e]||[]).forEach(f=>{try{f(d)}catch(x){console.error(x)}})}
+  connect(url,pw){return new Promise((res,rej)=>{
+    let ws;try{ws=new WebSocket(url,'obswebsocket.json')}catch(e){return rej(new Error('alamat tidak sah'))}
+    this.ws=ws;let settled=false;
+    const fail=m=>{if(!settled){settled=true;rej(new Error(m))}};
+    ws.onerror=()=>fail('tidak dapat sambung (OBS belum dibuka atau WebSocket belum diaktifkan)');
+    ws.onclose=e=>{const was=this.ok;this.ok=false;this.pend.forEach(p=>p.rej(new Error('sambungan terputus')));this.pend.clear();
+      if(!settled)fail(e.code===4009?'kata laluan salah':'sambungan ditutup');else if(was)this.emit('close',e)};
+    ws.onmessage=ev=>{let m;try{m=JSON.parse(ev.data)}catch(e){return}
+      if(m.op===0){const id={rpcVersion:1,eventSubscriptions:2047|65536};const a=m.d.authentication;
+        if(a){if(!pw){return fail('OBS meminta kata laluan')}const secret=sha256b64(pw+a.salt);id.authentication=sha256b64(secret+a.challenge)}
+        ws.send(JSON.stringify({op:1,d:id}))}
+      else if(m.op===2){this.ok=true;if(!settled){settled=true;res()}}
+      else if(m.op===5){this.emit(m.d.eventType,m.d.eventData||{})}
+      else if(m.op===7){const p=this.pend.get(m.d.requestId);if(!p)return;this.pend.delete(m.d.requestId);
+        if(m.d.requestStatus&&m.d.requestStatus.result)p.res(m.d.responseData||{});else p.rej(Object.assign(new Error((m.d.requestStatus&&m.d.requestStatus.comment)||'ralat OBS'),{code:m.d.requestStatus&&m.d.requestStatus.code}))}};
+  })}
+  call(type,data){return new Promise((res,rej)=>{if(!this.ok)return rej(new Error('belum bersambung'));const id='r'+(this.rid++);this.pend.set(id,{res,rej});
+    this.ws.send(JSON.stringify({op:6,d:{requestType:type,requestId:id,requestData:data||{}}}))})}
+  close(){this.manual=true;try{this.ws&&this.ws.close()}catch(e){}}
+}
+
+/* ============ Mod Demo (OBS palsu untuk latihan/paparan contoh) ============ */
+class MockObs{
+  constructor(){this.h={};this.ok=false;this.t0=0;this.rec0=0;this.timer=null;
+    this.scene='KULIAH PERDANA';this.scenes=['SEBENTAR LAGI','INFAQ & PENGUMUMAN','KHUTBAH JUMAAT','KULIAH PERDANA'];
+    this.items={};this.scenes.forEach(s=>this.items[s]=[
+      {sceneItemId:1,sourceName:'Kamera PTZ',sceneItemEnabled:true,inputKind:'ffmpeg_source'},
+      {sceneItemId:2,sourceName:'Logo Masjid',sceneItemEnabled:true,inputKind:'image_source'},
+      {sceneItemId:3,sourceName:'Teks Tajuk',sceneItemEnabled:true,inputKind:'text_gdiplus_v3'},
+      {sceneItemId:4,sourceName:'Teks Penceramah',sceneItemEnabled:true,inputKind:'text_gdiplus_v3'},
+      {sceneItemId:5,sourceName:'Teks Berjalan',sceneItemEnabled:true,inputKind:'text_gdiplus_v3'},
+      {sceneItemId:6,sourceName:'QR Jom Infaq',sceneItemEnabled:s!=='KHUTBAH JUMAAT',inputKind:'image_source'}]);
+    this.inputs=[['Kamera PTZ','ffmpeg_source'],['Logo Masjid','image_source'],['Teks Tajuk','text_gdiplus_v3'],['Teks Penceramah','text_gdiplus_v3'],['Teks Berjalan','text_gdiplus_v3'],['QR Jom Infaq','image_source'],['Mixer USB (Mic/Aux)','wasapi_input_capture'],['Audio PC (Desktop)','wasapi_output_capture']];
+    this.mute={'Mixer USB (Mic/Aux)':false,'Audio PC (Desktop)':true,'Kamera PTZ':true};
+    this.vol={'Mixer USB (Mic/Aux)':-6,'Audio PC (Desktop)':0,'Kamera PTZ':0};
+    this.mon={'Mixer USB (Mic/Aux)':'OBS_MONITORING_TYPE_NONE','Audio PC (Desktop)':'OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT','Kamera PTZ':'OBS_MONITORING_TYPE_NONE'};
+    this.text={'Teks Tajuk':'Kuliah Maghrib','Teks Penceramah':'Ustaz Yasin','Teks Berjalan':'Selamat datang ke siaran langsung Masjid Jeram'};
+    this.stream=false;this.rec=false;this.ph=0}
+  on(e,f){(this.h[e]=this.h[e]||[]).push(f)}
+  emit(e,d){(this.h[e]||[]).forEach(f=>f(d))}
+  connect(){return new Promise(r=>setTimeout(()=>{this.ok=true;this.timer=setInterval(()=>this.tick(),100);r()},350))}
+  close(){clearInterval(this.timer);this.ok=false}
+  tick(){this.ph+=.35;const sp=Math.max(0,Math.sin(this.ph)*.5+.5);const lvl=n=>this.mute[n]?0.0001:Math.max(.0004,Math.pow(10,(this.vol[n]-30+sp*(26+Math.random()*4))/20));
+    const m=['Mixer USB (Mic/Aux)','Audio PC (Desktop)','Kamera PTZ'].map(n=>{const v=lvl(n);return{inputName:n,inputLevelsMul:[[v,v,v],[v*.9,v*.95,v*.95]]}});
+    this.emit('InputVolumeMeters',{inputs:m})}
+  async call(t,d){await new Promise(r=>setTimeout(r,25));d=d||{};
+    switch(t){
+      case'GetVersion':return{obsVersion:'demo'};
+      case'GetSceneList':return{currentProgramSceneName:this.scene,scenes:this.scenes.map((s,i)=>({sceneName:s,sceneIndex:i}))};
+      case'GetCurrentProgramScene':return{currentProgramSceneName:this.scene};
+      case'SetCurrentProgramScene':this.scene=d.sceneName;this.emit('CurrentProgramSceneChanged',{sceneName:d.sceneName});return{};
+      case'GetSceneItemList':return{sceneItems:this.items[d.sceneName].map(x=>({...x}))};
+      case'SetSceneItemEnabled':this.items[d.sceneName].find(x=>x.sceneItemId===d.sceneItemId).sceneItemEnabled=d.sceneItemEnabled;this.emit('SceneItemEnableStateChanged',{sceneName:d.sceneName,sceneItemId:d.sceneItemId,sceneItemEnabled:d.sceneItemEnabled});return{};
+      case'GetInputList':return{inputs:this.inputs.map(([n,k])=>({inputName:n,inputKind:k}))};
+      case'GetInputSettings':return{inputSettings:{text:this.text[d.inputName]||''}};
+      case'SetInputSettings':if(d.inputSettings&&'text'in d.inputSettings)this.text[d.inputName]=d.inputSettings.text;return{};
+      case'GetInputMute':return{inputMuted:!!this.mute[d.inputName]};
+      case'SetInputMute':this.mute[d.inputName]=d.inputMuted;this.emit('InputMuteStateChanged',{inputName:d.inputName,inputMuted:d.inputMuted});return{};
+      case'GetInputVolume':{const v=this.vol[d.inputName]||0;return{inputVolumeDb:v,inputVolumeMul:Math.pow(10,v/20)}}
+      case'SetInputVolume':this.vol[d.inputName]=d.inputVolumeDb;return{};
+      case'GetInputAudioMonitorType':return{monitorType:this.mon[d.inputName]||'OBS_MONITORING_TYPE_NONE'};
+      case'SetInputAudioMonitorType':this.mon[d.inputName]=d.monitorType;return{};
+      case'GetStreamStatus':return{outputActive:this.stream,outputDuration:this.stream?Date.now()-this.t0:0,outputSkippedFrames:this.stream?Math.floor((Date.now()-this.t0)/9000):0,outputTotalFrames:this.stream?Math.floor((Date.now()-this.t0)/33):0};
+      case'GetRecordStatus':return{outputActive:this.rec,outputDuration:this.rec?Date.now()-this.rec0:0};
+      case'GetStats':return{cpuUsage:6+Math.random()*3,activeFps:30};
+      case'StartStream':this.stream=true;this.t0=Date.now();this.emit('StreamStateChanged',{outputActive:true,outputState:'OBS_WEBSOCKET_OUTPUT_STARTED'});return{};
+      case'StopStream':this.stream=false;this.emit('StreamStateChanged',{outputActive:false,outputState:'OBS_WEBSOCKET_OUTPUT_STOPPED'});return{};
+      case'StartRecord':this.rec=true;this.rec0=Date.now();this.emit('RecordStateChanged',{outputActive:true});return{};
+      case'StopRecord':this.rec=false;this.emit('RecordStateChanged',{outputActive:false});return{outputPath:'demo.mkv'};
+    }
+    throw new Error('tidak disokong dalam demo: '+t)}
+}
+
+/* ============ Keadaan & rujukan DOM ============ */
+const S={obs:null,demo:false,scenes:[],cur:'',items:[],audio:[],texts:[],stream:false,rec:false,timer:null,reTimer:null,meters:{},peaks:{}};
+const AUDIO_KIND=/(wasapi_|coreaudio_|pulse_|alsa_|jack_|dshow_input|av_capture|ffmpeg_source|vlc_source|browser_source|sck_audio|pipewire|oss_)/;
+const MON_TXT={OBS_MONITORING_TYPE_NONE:'Tiada (disyorkan)',OBS_MONITORING_TYPE_MONITOR_ONLY:'Monitor sahaja',OBS_MONITORING_TYPE_MONITOR_AND_OUTPUT:'Monitor & Output'};
+const call=(t,d)=>S.obs.call(t,d);
+const safe=async(p,msg)=>{try{return await p}catch(e){toast((msg||'Ralat')+': '+e.message,'bad');return null}};
+
+/* ============ Tooltip (satu kotak, pandai kedudukan) ============ */
+(()=>{const tb=$('#tipbox');let cur=null;
+ function show(t){const x=t.getAttribute('data-tip');if(!x)return;cur=t;tb.textContent=x;tb.style.display='block';
+  const r=t.getBoundingClientRect(),w=tb.offsetWidth,h=tb.offsetHeight;let l=r.left+r.width/2-w/2;l=Math.max(8,Math.min(l,innerWidth-w-8));
+  let tp=r.top-h-8;if(tp<8)tp=r.bottom+8;tb.style.left=l+'px';tb.style.top=tp+'px'}
+ function hide(){cur=null;tb.style.display='none'}
+ document.addEventListener('mouseover',e=>{const t=e.target.closest('[data-tip]');if(t)show(t)});
+ document.addEventListener('mouseout',e=>{if(e.target.closest('[data-tip]'))hide()});
+ document.addEventListener('focusin',e=>{const t=e.target.closest('[data-tip]');if(t)show(t)});
+ document.addEventListener('focusout',hide);
+ document.addEventListener('click',e=>{if(!e.target.closest('[data-tip]'))hide()});
+ document.addEventListener('scroll',hide,true)})();
+
+/* ============ Sambungan ============ */
+function setConn(txt,cls){$('#connText').textContent=txt;$('#connDot').className='dot '+(cls||'')}
+function cfg(){return LS.get('mj_conn',{host:'localhost',port:4455,pass:'',rem:true})}
+async function connect(demo){
+  clearTimeout(S.reTimer);stopPoll();
+  if(S.obs){S.obs.manual=true;try{S.obs.close()}catch(e){}}
+  S.demo=!!demo;$('#demoBanner').style.display=demo?'block':'none';
+  const c={host:$('#cHost').value.trim()||'localhost',port:+$('#cPort').value||4455,pass:$('#cPass').value,rem:$('#cRem').checked};
+  const obs=demo?new MockObs():new ObsClient();S.obs=obs;bind(obs);
+  setConn('Menyambung…','wait');
+  try{await obs.connect('ws://'+c.host+':'+c.port,c.pass)}
+  catch(e){setConn('Tidak bersambung','bad');toast('Gagal sambung: '+e.message,'bad');if(!demo&&!obs.manual)scheduleRe();return false}
+  if(!demo)LS.set('mj_conn',c.rem?c:{host:c.host,port:c.port,pass:'',rem:false});
+  setConn(demo?'Mod Demo':'Bersambung ke OBS','ok');
+  $('#dlg').close&&$('#dlg').open&&$('#dlg').close();
+  await refreshAll();startPoll();return true}
+function scheduleRe(){clearTimeout(S.reTimer);S.reTimer=setTimeout(()=>{if(S.obs&&!S.obs.ok&&!S.obs.manual&&!S.demo)connect(false)},6000)}
+function bind(o){
+  o.on('close',()=>{if(o.manual)return;setConn('Terputus — cuba sambung semula…','bad');stopPoll();toast('Sambungan ke OBS terputus.','warn');if(!S.demo)scheduleRe()});
+  o.on('CurrentProgramSceneChanged',d=>{S.cur=d.sceneName;renderScenes();loadItems()});
+  o.on('SceneListChanged',()=>loadScenes());
+  o.on('SceneItemEnableStateChanged',d=>{if(d.sceneName===S.cur){const it=S.items.find(x=>x.sceneItemId===d.sceneItemId);if(it){it.sceneItemEnabled=d.sceneItemEnabled;renderItems()}}});
+  o.on('StreamStateChanged',d=>{S.stream=!!d.outputActive;renderLive()});
+  o.on('RecordStateChanged',d=>{S.rec=!!d.outputActive;renderLive()});
+  o.on('InputMuteStateChanged',d=>{const a=S.audio.find(x=>x.name===d.inputName);if(a){a.muted=d.inputMuted;paintAudio(a)}});
+  o.on('InputVolumeChanged',d=>{const a=S.audio.find(x=>x.name===d.inputName);if(a){a.db=d.inputVolumeDb;paintAudio(a)}});
+  ['InputCreated','InputRemoved','InputNameChanged'].forEach(e=>o.on(e,()=>loadInputs()));
+  o.on('InputVolumeMeters',d=>{(d.inputs||[]).forEach(i=>{let p=-100;(i.inputLevelsMul||[]).forEach(c=>{p=Math.max(p,db(c[1]))});S.meters[i.inputName]=p})});
+}
+async function refreshAll(){await loadScenes();await loadInputs();await pollStatus()}
+
+/* ============ Paparan (scene) ============ */
+async function loadScenes(){const r=await safe(call('GetSceneList'),'Gagal baca senarai paparan');if(!r)return;S.scenes=r.scenes.slice().reverse().map(s=>s.sceneName);S.cur=r.currentProgramSceneName;renderScenes();await loadItems()}
+function renderScenes(){const b=$('#scenes');b.replaceChildren();
+  if(!S.scenes.length){b.append(el('div',{class:'empty',text:'Tiada paparan dijumpai dalam OBS.'}));return}
+  S.scenes.forEach(n=>b.append(el('button',{class:'scene'+(n===S.cur?' on':''),text:n,'data-tip':n===S.cur?'Paparan ini sedang dilihat penonton.':'Tekan untuk tukar ke paparan ini.',onclick:async()=>{if(n!==S.cur)await safe(call('SetCurrentProgramScene',{sceneName:n}),'Gagal tukar paparan')}})));
+  $('#curScene').textContent=S.cur||'–'}
+async function loadItems(){const r=await safe(call('GetSceneItemList',{sceneName:S.cur}),'Gagal baca item paparan');if(!r)return;S.items=r.sceneItems.slice().reverse();renderItems()}
+const ICON=k=>/^text_/.test(k||'')?'🔤':/image/.test(k||'')?'🖼️':/(ffmpeg|dshow|av_capture|v4l2|vlc)/.test(k||'')?'🎥':/(monitor|window|display|game)/.test(k||'')?'🖥️':/browser/.test(k||'')?'🌐':'▫️';
+function renderItems(){const b=$('#items');b.replaceChildren();$('#curScene').textContent=S.cur||'–';
+  if(!S.items.length){b.append(el('div',{class:'empty',text:'Paparan ini tiada item.'}));return}
+  S.items.forEach(it=>{const inp=el('input',{type:'checkbox','aria-label':'Papar '+it.sourceName});inp.checked=!!it.sceneItemEnabled;
+    inp.onchange=async()=>{const ok=await safe(call('SetSceneItemEnabled',{sceneName:S.cur,sceneItemId:it.sceneItemId,sceneItemEnabled:inp.checked}),'Gagal tukar lapisan');if(ok===null){inp.checked=!inp.checked}};
+    b.append(el('div',{class:'item'},el('div',{class:'nm'},el('span',{text:ICON(it.inputKind),'aria-hidden':'true'}),el('span',{text:it.sourceName})),el('label',{class:'sw','data-tip':'Hidupkan/matikan: '+it.sourceName},inp,el('i'))))})}
+
+/* ============ Input: audio & teks ============ */
+async function loadInputs(){const r=await safe(call('GetInputList'),'Gagal baca senarai sumber');if(!r)return;
+  S.texts=r.inputs.filter(i=>/^text_/.test(i.inputKind)).map(i=>i.inputName);
+  const au=r.inputs.filter(i=>AUDIO_KIND.test(i.inputKind));
+  S.audio=(await Promise.all(au.map(async i=>{try{const[m,v,mo]=await Promise.all([call('GetInputMute',{inputName:i.inputName}),call('GetInputVolume',{inputName:i.inputName}),call('GetInputAudioMonitorType',{inputName:i.inputName}).catch(()=>({monitorType:'OBS_MONITORING_TYPE_NONE'}))]);
+    return{name:i.inputName,kind:i.inputKind,muted:m.inputMuted,db:Math.round(v.inputVolumeDb*2)/2,mon:mo.monitorType}}catch(e){return null}}))).filter(Boolean);
+  renderAudio();renderMap()}
+const refs={};
+function renderAudio(){const b=$('#audio');b.replaceChildren();for(const k in refs)delete refs[k];
+  if(!S.audio.length){b.append(el('div',{class:'empty',text:'Tiada sumber audio dijumpai dalam OBS.'}));return}
+  S.audio.forEach(a=>{
+    const mk=el('div',{class:'mk'}),pk=el('div',{class:'pk'});
+    const meter=el('div',{class:'meter','data-tip':'Paras bunyi semasa. Hijau/kuning = baik. Merah = terlalu kuat.'},mk,pk);
+    const lvl=el('span',{class:'hint',style:'margin:0',text:'–'});
+    const mute=el('button',{class:'mute','data-tip':'Senyapkan atau hidupkan semula sumber audio ini pada siaran.',onclick:async()=>{await safe(call('SetInputMute',{inputName:a.name,inputMuted:!a.muted}),'Gagal tukar senyap')}});
+    const sl=el('input',{type:'range',min:-60,max:0,step:.5,'aria-label':'Kelantangan '+a.name,'data-tip':'Laraskan kelantangan sumber ini untuk siaran sahaja. Tidak mengubah bunyi di dalam masjid.'});
+    let dt=null;sl.oninput=()=>{a.db=+sl.value;vt.textContent=a.db+' dB';clearTimeout(dt);dt=setTimeout(()=>safe(call('SetInputVolume',{inputName:a.name,inputVolumeDb:a.db}),'Gagal laras kelantangan'),120)};
+    const vt=el('span',{style:'min-width:58px;text-align:right;font-variant-numeric:tabular-nums'});
+    const sel=el('select',{'aria-label':'Mod monitor '+a.name});Object.keys(MON_TXT).forEach(k=>{const o=el('option',{value:k,text:MON_TXT[k]});sel.append(o)});
+    sel.onchange=async()=>{const r=await safe(call('SetInputAudioMonitorType',{inputName:a.name,monitorType:sel.value}),'Gagal tukar monitor');if(r!==null){a.mon=sel.value;paintAudio(a)}};
+    const fix=el('button',{text:'Matikan monitor','data-tip':'Tetapkan monitor kepada “Tiada” supaya bunyi dari OBS tidak dimainkan semula ke speaker/PA.',onclick:async()=>{const r=await safe(call('SetInputAudioMonitorType',{inputName:a.name,monitorType:'OBS_MONITORING_TYPE_NONE'}),'Gagal');if(r!==null){a.mon='OBS_MONITORING_TYPE_NONE';paintAudio(a);toast('Monitor dimatikan untuk '+a.name,'ok')}}});
+    const warn=el('div',{class:'warnbox'},'⚠ Monitor aktif. Bunyi OBS dimainkan semula ke peranti PC. Jika peranti itu bersambung ke mixer/PA, bunyi akan kedengaran dua kali. ',fix);
+    const row=el('div',{class:'arow'},el('div',{class:'ahead'},el('b',{text:a.name}),lvl),meter,el('div',{class:'scale'},el('span',{text:'-60'}),el('span',{text:'-40'}),el('span',{text:'-20'}),el('span',{text:'-9'}),el('span',{text:'0 dB'})),
+      el('div',{class:'ctl'},mute,sl,vt),el('div',{class:'mon'},el('span',{text:'Monitor:'}),sel,el('span',{class:'tip',tabindex:0,'data-tip':'Monitor ialah ciri OBS yang memainkan bunyi ke speaker PC. Untuk siaran masjid, biarkan “Tiada” bagi mengelak bunyi berganda.',text:'?'})),warn);
+    b.append(row);refs[a.name]={row,mk,pk,lvl,mute,sl,vt,sel,warn}});
+  S.audio.forEach(paintAudio)}
+function paintAudio(a){const r=refs[a.name];if(!r)return;r.mute.textContent=a.muted?'🔇 Senyap':'🔊 Hidup';r.mute.classList.toggle('m',!!a.muted);
+  if(document.activeElement!==r.sl)r.sl.value=a.db;r.vt.textContent=a.db+' dB';r.sel.value=a.mon;const bad=a.mon!=='OBS_MONITORING_TYPE_NONE';r.warn.style.display=bad?'block':'none';r.row.classList.toggle('alert',bad)}
+(function loop(){requestAnimationFrame(loop);for(const n in refs){const r=refs[n],a=S.audio.find(x=>x.name===n);let p=S.meters[n];if(p==null)continue;
+  if(a&&a.muted)p=-100;const pc=Math.max(0,Math.min(1,(p+60)/60));r.mk.style.width=(100-pc*100)+'%';
+  const pp=S.peaks[n]=Math.max(pc,(S.peaks[n]||0)-.004);r.pk.style.left='calc('+(pp*100)+'% - 3px)';r.pk.style.display=pp>.01?'block':'none';
+  r.lvl.textContent=p<-59?'Tiada bunyi':(p>-3?'Terlalu kuat!':(Math.round(p)+' dB'));r.lvl.style.color=p>-3?'#c0392b':''}})();
+
+/* ============ Siaran & rakaman ============ */
+function renderLive(){const b=$('#liveBadge');b.textContent=S.stream?'● LANGSUNG':'TIDAK DISIARKAN';b.classList.toggle('live',S.stream);
+  $('#btnStart').disabled=S.stream||!S.obs||!S.obs.ok;$('#btnStop').disabled=!S.stream;
+  $('#btnRec').textContent=S.rec?'⏹ Henti Rakaman':'⏺ Mula Rakaman';$('#stRec').textContent=S.rec?'Merakam':'Mati';
+  $('#btnStart').style.display='';$('#btnStop').style.display=''}
+async function pollStatus(){if(!S.obs||!S.obs.ok)return;
+  try{const[s,r,t]=await Promise.all([call('GetStreamStatus'),call('GetRecordStatus'),call('GetStats')]);
+    S.stream=s.outputActive;S.rec=r.outputActive;$('#stDur').textContent=fmtDur(s.outputDuration||0);
+    const tot=s.outputTotalFrames||0,sk=s.outputSkippedFrames||0,pc=tot?sk/tot*100:0;$('#stDrop').textContent=pc.toFixed(1)+'%';$('#stDropBox').classList.toggle('warn',pc>=2);
+    $('#stCpu').textContent=Math.round(t.cpuUsage)+'%';$('#stFps').textContent=Math.round(t.activeFps);renderLive()}catch(e){}}
+function startPoll(){stopPoll();S.timer=setInterval(pollStatus,1500)}function stopPoll(){clearInterval(S.timer)}
+function arm(btn,txt,fn){if(btn._arm){clearTimeout(btn._t);btn._arm=false;btn.classList.remove('armed');btn.textContent=btn._orig;return fn()}
+  btn._arm=true;btn._orig=btn.textContent;btn.textContent=txt;btn.classList.add('armed');btn._t=setTimeout(()=>{btn._arm=false;btn.classList.remove('armed');btn.textContent=btn._orig},5000)}
+$('#btnStart').onclick=function(){const incomplete=ticks().length<CHECK.length;
+  const go=async()=>{const r=await safe(call('StartStream'),'Gagal mula siaran. Semak tetapan Stream (kunci siaran) di OBS');if(r!==null)toast(S.demo?'Demo: siaran contoh dimulakan.':'Siaran dimulakan. Semak lencana LANGSUNG.','ok')};
+  if(incomplete)arm(this,'Senarai semak belum lengkap — tekan SEKALI LAGI',go);else go()};
+$('#btnStop').onclick=function(){arm(this,'Sahkan TAMAT? Tekan sekali lagi',async()=>{const r=await safe(call('StopStream'),'Gagal tamat siaran');if(r!==null)toast('Siaran ditamatkan.','ok')})};
+$('#btnRec').onclick=async()=>{await safe(call(S.rec?'StopRecord':'StartRecord'),'Gagal tukar rakaman')};
+
+/* ============ Teks & preset ============ */
+const FIELDS=[['Tajuk','fTajuk','mTajuk',/tajuk|title|program|kuliah/i],['Penceramah','fPenceramah','mPenceramah',/penceramah|speaker|ustaz|nama/i],['Berjalan','fBerjalan','mBerjalan',/berjalan|ticker|running|scroll|marquee|teks bawah|bawah/i]];
+function getMap(){return LS.get('mj_map',{})}
+function renderMap(){const m=getMap();let changed=false;FIELDS.forEach(([k,,sid,re])=>{const s=$('#'+sid);s.replaceChildren(el('option',{value:'',text:'— tidak dipilih —'}));S.texts.forEach(n=>s.append(el('option',{value:n,text:n})));
+  if(!m[k]||!S.texts.includes(m[k])){const g=S.texts.find(n=>re.test(n)&&!Object.values(m).includes(n));if(g){m[k]=g;changed=true}else if(m[k]&&!S.texts.includes(m[k])){delete m[k];changed=true}}
+  s.value=m[k]||'';s.onchange=()=>{const mm=getMap();if(s.value)mm[k]=s.value;else delete mm[k];LS.set('mj_map',mm)}});if(changed)LS.set('mj_map',m)}
+async function sendText(vals){const m=getMap();let n=0;for(const[k,fid]of FIELDS.map(f=>[f[0],f[1]])){const tgt=m[k];if(!tgt)continue;
+  const ok=await safe(call('SetInputSettings',{inputName:tgt,inputSettings:{text:vals?vals[k]:$('#'+fid).value},overlay:true}),'Gagal kemas kini '+k);if(ok!==null)n++}
+  if(!n)toast('Tiada kotak teks OBS dipilih. Buka “Tetapan lanjutan” untuk memilih.','warn');else toast(n+' kotak teks dikemas kini pada skrin.','ok')}
+$('#btnSendText').onclick=()=>sendText();
+$('#btnClearText').onclick=()=>sendText({Tajuk:'',Penceramah:'',Berjalan:''});
+function presets(){return LS.get('mj_presets',[])}
+function renderPresets(){const s=$('#pSel');s.replaceChildren();const p=presets();if(!p.length)s.append(el('option',{value:'',text:'(belum ada preset)'}));p.forEach((x,i)=>s.append(el('option',{value:i,text:x.name})))}
+$('#pSave').onclick=()=>{const n=$('#pName').value.trim();if(!n)return toast('Isi nama preset dahulu.','warn');const p=presets().filter(x=>x.name!==n);p.push({name:n,Tajuk:$('#fTajuk').value,Penceramah:$('#fPenceramah').value,Berjalan:$('#fBerjalan').value});LS.set('mj_presets',p);renderPresets();$('#pName').value='';toast('Preset disimpan.','ok')};
+$('#pLoad').onclick=()=>{const x=presets()[+$('#pSel').value];if(!x)return;$('#fTajuk').value=x.Tajuk;$('#fPenceramah').value=x.Penceramah;$('#fBerjalan').value=x.Berjalan;toast('Preset dimuatkan. Tekan Hantar ke Skrin.','ok')};
+$('#pDel').onclick=()=>{const i=+$('#pSel').value;const p=presets();if(!p[i])return;p.splice(i,1);LS.set('mj_presets',p);renderPresets();toast('Preset dipadam.')};
+['fTajuk','fPenceramah','fBerjalan'].forEach(id=>{$('#'+id).value=LS.get('mj_'+id,'');$('#'+id).addEventListener('input',e=>LS.set('mj_'+id,e.target.value))});
+
+/* ============ Senarai semak ============ */
+const CHECK=['Mic imam/penceramah dihidupkan di mixer dan paras bunyi sihat (tidak merah).','Meter audio dalam panel ini bergerak (hijau/kuning, bukan merah).','Tiada amaran kuning “Monitor aktif” pada bahagian Audio.','Kamera PTZ menghala ke mimbar/ruang kuliah (bukan ruang muslimat).','Paparan yang betul telah dipilih.','Tajuk dan nama penceramah telah dihantar ke skrin.','Kabel internet (LAN) bersambung dan internet berfungsi.','Akaun/halaman siaran (Facebook/YouTube) sedia dan kunci siaran telah ditetapkan di OBS.'];
+const today=()=>new Date().toISOString().slice(0,10);
+function ticks(){const c=LS.get('mj_chk',{});return c.d===today()?c.t||[]:[]}
+function renderChecks(){const b=$('#checks');b.replaceChildren();const t=ticks();
+  CHECK.forEach((txt,i)=>{const cb=el('input',{type:'checkbox'});cb.checked=t.includes(i);cb.onchange=()=>{const s=new Set(ticks());cb.checked?s.add(i):s.delete(i);LS.set('mj_chk',{d:today(),t:[...s]});updChk()};b.append(el('label',{},cb,el('span',{text:txt})))});updChk()}
+function updChk(){const n=ticks().length;$('#chkBar').style.width=(n/CHECK.length*100)+'%';$('#chkTxt').textContent=n+' / '+CHECK.length+' selesai'}
+$('#btnChkReset').onclick=()=>{LS.set('mj_chk',{d:today(),t:[]});renderChecks()};
+
+/* ============ Dialog sambungan ============ */
+const dlg=$('#dlg');
+function openDlg(){const c=cfg();$('#cHost').value=c.host;$('#cPort').value=c.port;$('#cPass').value=c.pass||'';$('#cRem').checked=c.rem!==false;dlg.showModal?dlg.showModal():dlg.setAttribute('open','')}
+$('#btnSettings').onclick=openDlg;$('#cClose').onclick=()=>dlg.close();
+$('#cGo').onclick=async()=>{const ok=await connect(false);if(ok)dlg.close()};
+$('#cDemo').onclick=async()=>{await connect(true);dlg.close()};
+$('#cOff').onclick=()=>{if(S.obs){S.obs.manual=true;S.obs.close()}stopPoll();clearTimeout(S.reTimer);setConn('Belum bersambung','');$('#demoBanner').style.display='none';dlg.close()};
+
+/* ============ Mula ============ */
+renderChecks();renderPresets();renderLive();
+(async()=>{const q=new URLSearchParams(location.search);
+  if(q.get('demo')==='1'){await connect(true);return}
+  const c=LS.get('mj_conn',null);
+  if(c){$('#cHost').value=c.host;$('#cPort').value=c.port;$('#cPass').value=c.pass||'';$('#cRem').checked=c.rem!==false;const ok=await connect(false);if(!ok)openDlg()}
+  else openDlg()})();
+</script>
+</body>
+</html>

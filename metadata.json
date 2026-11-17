@@ -1,0 +1,6 @@
+{
+  "name": "Panel Siaran OBS Masjid",
+  "description": "Panel kawalan siaran langsung OBS Studio yang mudah untuk AJK masjid melalui obs-websocket v5.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}

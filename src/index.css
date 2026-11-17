@@ -1,0 +1,121 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root,
+:root[data-accent="emerald"] {
+  --accent: #047857;
+  --accent-hover: #065f46;
+  --accent-soft: #ecfdf5;
+  --accent-soft-dark: rgba(6, 78, 59, 0.45);
+  --accent-border: #10b981;
+  --accent-text: #065f46;
+  --accent-text-dark: #6ee7b7;
+}
+
+:root[data-accent="indigo"] {
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --accent-soft: #eff6ff;
+  --accent-soft-dark: rgba(30, 58, 138, 0.45);
+  --accent-border: #3b82f6;
+  --accent-text: #1e40af;
+  --accent-text-dark: #93c5fd;
+}
+
+:root[data-accent="amber"] {
+  --accent: #b45309;
+  --accent-hover: #92400e;
+  --accent-soft: #fffbeb;
+  --accent-soft-dark: rgba(120, 53, 15, 0.45);
+  --accent-border: #f59e0b;
+  --accent-text: #92400e;
+  --accent-text-dark: #fcd34d;
+}
+
+:root[data-accent="teal"] {
+  --accent: #0f766e;
+  --accent-hover: #115e59;
+  --accent-soft: #f0fdfa;
+  --accent-soft-dark: rgba(19, 78, 74, 0.45);
+  --accent-border: #14b8a6;
+  --accent-text: #115e59;
+  --accent-text-dark: #5eead4;
+}
+
+@layer base {
+  html {
+    font-family: "Segoe UI", system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    font-size: 16px;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  html[data-layout="large"] {
+    font-size: 17.5px;
+  }
+
+  .font-mono-tabular {
+    font-family: ui-monospace, "Cascadia Code", "SFMono-Regular", Menlo, Monaco, Consolas, monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+.accent-btn {
+  background-color: var(--accent);
+  color: #ffffff;
+}
+.accent-btn:hover:not(:disabled) {
+  background-color: var(--accent-hover);
+}
+
+.accent-active-card {
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft);
+}
+.dark .accent-active-card {
+  border-color: var(--accent-border);
+  background-color: var(--accent-soft-dark);
+}
+
+.accent-label {
+  color: var(--accent-text);
+}
+.dark .accent-label {
+  color: var(--accent-text-dark);
+}
+
+.accent-bar {
+  background-color: var(--accent);
+}
+
+@keyframes ticker-marquee {
+  0% {
+    transform: translateX(65%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.animate-ticker {
+  display: inline-block;
+  white-space: nowrap;
+  animation: ticker-marquee 16s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-ticker {
+    animation: none !important;
+    transform: none !important;
+    white-space: normal !important;
+  }
+}
